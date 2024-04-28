@@ -1,0 +1,33 @@
+---
+title: "Progress Memo"
+subtitle: |
+  | Final Project 
+  | Data Visualization (STAT 302)
+author: "Junho Park"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+---
+
+## Data source
+
+> I found my data source on Kaggle. The data is about college basketball statistics by team. The dataset breaks down the season statistics of each team in division 1 college basketball. The dataset includes variables such as team name, conference, games played, number of games won, offensive efficiency, defensive efficiency, power ranking, etc. The link to the dataset is [here](https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb21.csv)
+
+## Basic data description
+
+> The whole dataset has 2,455 observations on 24 variables. Of the 24 variables, 3 of the variables are categorical and the rest are continuous variables. There are 1979 missing values for the POSTSEASON and SEED variables, but this is due to the fact that many teams don't make the postseason tournament and are not seeded. There are no other missing values for any other variables. 
+
+## Why this data
+
+> I decided to choose the college basketball dataset because of my interest in Basketball as a sport. I started to follow college basketball as a kid, and I would like to explore the topic in this project. 
+
+## Visualization plan
+
+> I plan to create a presentation with static graphics, but am also considering creating an interactive app/dashboard to display the data. The dataset breaks down all the team statistics for each team. I think it would be interesting to filter teams by conference and visualize how different team statistics contribute to the power rankings of the teams. For example, I want to create a visualization that shows the difference between how offensive efficiency affects power rankings and how defensive efficiency affects power rankings. I also would like to create a visualization that shows which conference has the best teams and the best statistics.  
+
+### Misc
+
+> Building an app/dashboard instead of just static graphics could make my project more applicable and user-friendly. 

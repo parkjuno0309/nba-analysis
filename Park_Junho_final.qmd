@@ -1,0 +1,167 @@
+---
+title: "NCAA Basketball"
+format:
+  revealjs:
+    theme: moon
+    transition: slide
+    background-transition: convex
+editor: visual
+---
+
+## Data
+
+```{r}
+#| label: packages
+
+#loading packages:
+library(tidyverse)
+library(dplyr)
+library(viridis)
+library(gt)
+library(RColorBrewer)
+library(gtExtras )
+library(lubridate)
+library(ggthemes)
+library(ggrepel)
+library(magrittr)
+
+#read datasets
+cbb_data <- read.csv("data/cbb21.csv") %>% 
+  janitor::clean_names()
+```
+
+::: {style="font-size:60%;"}
+<div>
+
+-   Topic: College Basketball (NCAA) Team Statistics
+
+-   Why this data: I decided to choose the college basketball dataset because of my interest in Basketball as a sport. I started to follow college basketball as a kid, and I would like to explore the topic in more depth through this project.
+
+-   Citation: The link to the data set can be found [here](https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb21.csv)
+
+</div>
+
+![](images/data-slide-image.jpeg){fig-align="center" width="600"}
+:::
+
+## Graphic 1
+
+::: {style="font-size:50%;"}
+The visualization displays the relationship between defensive efficiency and offensive efficiency for each Division I college basketball team in the 2021 season. Each team is colored by their conference group, classified as either Mid-major, Power Five, or other. The adjusted offensive efficiency is the estimated number of points the team would score per 100 possessions against the average Division I defense. The adjusted defensive efficiency is the estimated number of points allowed per 100 possessions against the average Division I offense.
+:::
+
+```{r}
+cbb_data <- read.csv("data/cbb21.csv") %>% 
+  janitor::clean_names()
+
+color_palette <- brewer.pal(3, "Set1")
+
+# Create a new variable for conference group
+conf_group <- ifelse(cbb_data$conf %in% c("ACC", "B10", "B12", "P12", "SEC"), "Power Five", 
+                             ifelse(cbb_data$conf %in% c("A10", "Amer", "BE", "MWC", "WCC"), "Mid-Major", "Others"))
+
+# Plot
+ggplot(cbb_data, aes(x=adjoe, y=adjde, color=conf_group)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE, color="black") +
+  scale_color_manual(values = color_palette) +
+  theme_minimal() +
+  labs(x="Adjusted Offensive Efficiency", y="Adjusted Defensive Efficiency",
+       color="Conference Group",
+       title="Relationship between Offensive and Defensive Efficiencies",
+       subtitle="Colored by Conference Groups")
+```
+
+## Additional Information
+
+::: {style="font-size:50%;"}
+Upon examining the graph, it's apparent that teams from the Power Five conferences are primarily situated in the bottom-right corner of the scatter plot. In contrast, Mid-Major teams are distributed throughout, while teams from other conferences largely occupy the top left. In basketball, an ideal team aims for high adjusted offensive efficiency alongside low adjusted defensive efficiency. Hence, it's noticeable that Power Five conference teams often exhibit higher adjusted offensive efficiencies and lower adjusted defensive efficiencies.
+
+On the flip side, schools not included in the Power Five conferences or classified as Mid-Major programs generally display lower adjusted offensive efficiency paired with higher adjusted defensive efficiency. Therefore, we infer that Power Five Conference teams maintain superior offensive and defensive capabilities compared to their Mid-Major and other college basketball counterparts. It's also worth noting that Mid-Major institutions demonstrate better offense and defense compared to the remaining Division I basketball schools not part of the Power Five Conferences.
+
+In addition, we incorporated a line of best fit into the scatter plot to analyze the overarching trend between the two variables. The analysis revealed a pronounced negative correlation, implying that a team boasting high adjusted offensive efficiency is likely to possess low adjusted defensive efficiency, and vice versa. This observation allows us to conclude that teams excelling in offense usually also excel in defense. Conversely, teams that underperform in offense are prone to a weaker defense.
+:::
+
+## Graphic 2
+
+::: {style="font-size:50%;"}
+The visualization displays the distribution of Wins Above Bubble (WAB) values across different seed rankings in the NCAA tournament for the 2021 season. The WAB metric gives a measure of a team's performance above what would be expected from a team on the "bubble" of making the tournament. Each boxplot represents the interquartile range of WAB values for a particular seed,.
+:::
+
+```{r}
+cbb_data <- read.csv("data/cbb21.csv") %>% 
+  janitor::clean_names() %>%
+  drop_na(seed)  # drops rows where seed is NA
+
+# Create a new variable for conference group
+conf_group <- ifelse(cbb_data$conf %in% c("ACC", "B10", "B12", "P12", "SEC"), "Power Five", 
+                             ifelse(cbb_data$conf %in% c("A10", "Amer", "BE", "MWC", "WCC"), "Mid-Major", "Others"))
+
+# Plot
+ggplot(cbb_data, aes(x=factor(seed), y=wab)) +
+  geom_boxplot(outlier.shape = NA) +  # don't plot outliers, no color aesthetic
+  geom_jitter(aes(color=conf_group), position=position_jitter(0.2), alpha=0.7) +
+  scale_color_manual(values = color_palette) +
+  theme_minimal() +
+  labs(x="Seed in the NCAA Tournament",
+       y="Wins Above Bubble (WAB)",
+       color="Conference Group",
+       title="Distribution of Wins Above Bubble by Tournament Seed",
+       subtitle="Colored by Conference Groups")
+```
+
+## Additional Information
+
+::: {style="font-size:50%;"}
+In college basketball, the term "on the bubble" refers to teams teetering on the brink of selection for the NCAA Tournament, also recognized as March Madness. The metric 'Wins Above Bubble' (WAB) quantifies a team's wins relative to those anticipated for a typical bubble team, given an identical schedule.
+
+Examining the graph, a positive correlation between seeding in the NCAA tournament and WAB becomes apparent. Teams with higher seeds (closer to 1) usually exhibit a higher WAB on average. However, there are exceptions with certain teams having superior WAB scores but lower seedings than others. This discrepancy can likely be attributed to the consideration of various factors beyond the WAB metric for tournament seeding. Moreover, data points are color-coded based on their respective conference groups. A clear pattern emerges: most top-seeded teams (within the top 5) hail from a Power Five Conference. Conversely, teams assigned seeds 12-16 predominantly come from conferences outside of the Power Five or Mid-Major programs.
+
+An intriguing observation is that some teams, particularly those with lower seeds, secure a place in the NCAA tournament despite having a negative WAB. This outcome arises because the tournament mandates representation from all conferences. Winners of each conference's tournament automatically qualify for the NCAA tournament, thereby enabling teams with a negative WAB to still participate as lower seeds. In conclusion, participation and seeding in the NCAA tournament are influenced by a multitude of factors, and a positive WAB score doesn't guarantee a team's selection for the tournament.
+:::
+
+## Graphic 3
+
+::: {style="font-size:50%;"}
+This visualization, a line plot, depicts the average adjusted offensive efficiency (ADJOE) over multiple years, split by conference group. Each line in the plot represents a distinct conference group: Power Five, Mid-Major, and Others. The ADJOE value is a measure of a team's offensive prowess, accounting for the quality of the opponents' defense, and it is represented on the y-axis. The years are represented on the x-axis.
+:::
+
+```{r}
+cbb_data_all <- read.csv("data/cbb.csv") %>% 
+  janitor::clean_names() %>%
+  drop_na(seed)  # drops rows where seed is NA
+
+# Create a new variable for conference group
+cbb_data_all <- cbb_data_all %>%
+  mutate(conf_group = ifelse(conf %in% c("ACC", "B10", "B12", "P12", "SEC"), "Power Five", 
+                             ifelse(conf %in% c("A10", "Amer", "BE", "MWC", "WCC"), "Mid-Major", "Others")))
+
+
+# Calculate the average ADJOE for each year and each conference group
+avg_adjoe_data <- cbb_data_all %>%
+  group_by(year, conf_group) %>%
+  summarise(avg_adjoe = mean(adjoe, na.rm = TRUE), .groups = "drop")
+
+color_palette <- brewer.pal(3, "Dark2")
+
+# Plot
+ggplot(avg_adjoe_data, aes(x=year, y=avg_adjoe, color=conf_group)) +
+  geom_line(size=1) +
+  scale_color_manual(values = color_palette) +
+  theme_minimal() +
+  labs(x="Year",
+       y="Average Adjusted Offensive Efficiency",
+       color="Conference Group",
+       title="Average Adjusted Offensive Efficiency over Time by Conference Group",
+       subtitle="Lines represent different conference groups")
+```
+
+## Additional Information
+
+::: {style="font-size:50%;"}
+This line graph provides a visualization of the trends in average adjusted offensive efficiency (ADJOE) over several years, broken down by conference group, specifically Power Five, Mid-Major, and Others. The ADJOE metric, a quantification of a team's offensive effectiveness adjusted for the quality of defenses they have faced, is plotted on the y-axis. The time element, represented by distinct years, is shown on the x-axis.
+
+When we look at the graph, we see that the Power Five and Mid-Major groups usually do better than the Other group in terms of ADJOE. Most of the time, the Power Five group does better than the Mid-Major group, except for 2018 when it was the other way around. This tells us that the offense is usually better in the Power Five and Mid-Major groups, which could mean they have better players, better plans, or train harder.
+
+Also, there are interesting patterns when we look at how ADJOE changes over the years for all the groups. All three groups had better offense from 2013 to 2014, but then it got worse from 2014 to 2015. These similar trends might mean there are bigger things happening in college basketball that affect all teams in the same way. This could be because of changes in the rules, new styles of play, or a group of really good players having a big impact.
+:::
